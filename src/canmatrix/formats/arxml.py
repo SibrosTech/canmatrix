@@ -1817,8 +1817,9 @@ def decode_ethernet_helper(ea, float_factory):
                         continue
 
                 ipdu_name = ea.get_element_name(ipdu)
+                ipdu_length = ea.get_child(ipdu, "LENGTH") 
                 logger.debug("ETH PDU " + ipdu_name + " found")
-                target_frame = canmatrix.Frame(name=ipdu_name)
+                target_frame = canmatrix.Frame(name=ipdu_name, size=ipdu_length)
                 try:
                     target_frame.header_id = int(header_id.text, 0)
                 except:
@@ -2039,8 +2040,6 @@ def load(file, **options):
 
     if decode_flexray:
         result.update(decode_flexray_helper(ea, float_factory))
-
-    logger.info("USING FORKED VERSION")
 
     result = canmatrix.cancluster.CanCluster(result)
 
