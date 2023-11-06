@@ -1467,7 +1467,7 @@ def get_frame_from_container_ipdu(pdu, target_frame, ea, float_factory, headers_
             secured_i_pdu_name = ea.get_element_name(ipdu)
             payload = ea.follow_ref(ipdu, "PAYLOAD-REF")
             ipdu = ea.follow_ref(payload, "I-PDU-REF")
-            logger.info("found secured pdu '%s', dissolved to '%s'", secured_i_pdu_name, ea.get_element_name(ipdu))
+            logger.debug("found secured pdu '%s', dissolved to '%s'", secured_i_pdu_name, ea.get_element_name(ipdu))
         try:
             offset = int(ea.get_child(ipdu, "OFFSET").text, 0) * 8
         except:
@@ -1539,7 +1539,7 @@ def get_frame(frame_triggering, ea, multiplex_translation, float_factory, header
     frame_trig_name_elem = ea.get_child(frame_triggering, "SHORT-NAME")
     logger.debug("processing Frame-Trigger: %s", frame_trig_name_elem.text)
     if arb_id is None:
-        logger.info("found Frame-Trigger %s without arbitration id", frame_trig_name_elem.text)
+        logger.debug("found Frame-Trigger %s without arbitration id", frame_trig_name_elem.text)
         return None
     arbitration_id = int(arb_id.text, 0)
     isignaltriggerings_of_current_cluster = ea.selector(frame_triggering, "/..//I-SIGNAL-TRIGGERING")
@@ -1817,7 +1817,7 @@ def decode_ethernet_helper(ea, float_factory):
                         continue
 
                 ipdu_name = ea.get_element_name(ipdu)
-                logger.info("ETH PDU " + ipdu_name + " found")
+                logger.debug("ETH PDU " + ipdu_name + " found")
                 target_frame = canmatrix.Frame(name=ipdu_name)
                 try:
                     target_frame.header_id = int(header_id.text, 0)
@@ -2024,7 +2024,7 @@ def load(file, **options):
     com_module = ea.get_short_name_path("/ActiveEcuC/Com")
 
     if com_module is not None and len(com_module) > 0:
-        logger.info("seems to be a ECUC arxml. Very limited support for extracting canmatrix.")
+        logger.debug("seems to be a ECUC arxml. Very limited support for extracting canmatrix.")
         return extract_cm_from_ecuc(com_module, ea)
 
     logger.debug("%d frames in arxml...", get_frames_nb(ea))
@@ -2040,7 +2040,7 @@ def load(file, **options):
     if decode_flexray:
         result.update(decode_flexray_helper(ea, float_factory))
 
-    result.update(decode_can_helper(ea, float_factory, ignore_cluster_info))
+    logger.info("USING FORKED VERSION")
 
     result = canmatrix.cancluster.CanCluster(result)
 
